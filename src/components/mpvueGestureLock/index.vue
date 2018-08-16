@@ -30,10 +30,10 @@
     props: ['containerWidth', 'cycleRadius'],// 容器宽度 和 圆的半径 单位是 rpx
     data() {
       return {
-        gestureLock: {},
-        circleArray: [],
-        activeLine: {},
-        lineArray: [],
+        gestureLock: {}, // 锁对象
+        circleArray: [], // 圆对象数组
+        lineArray: [],// 已激活锁之间的线段
+        activeLine: {}, // 最后一个激活的锁与当前位置之间的线段
       }
     },
     methods: {

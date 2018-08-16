@@ -26,8 +26,9 @@ class GestureLock {
         count++;
         this.circleArray.push({
           count: count,
-          x: (cycleMargin + this.cycleRadius) * (j * 2 + 1),
-          y: (cycleMargin + this.cycleRadius) * (i * 2 + 1),
+          x: this.rpxTopx((cycleMargin + this.cycleRadius) * (j * 2 + 1)),
+          y: this.rpxTopx((cycleMargin + this.cycleRadius) * (i * 2 + 1)),
+          radius: this.rpxTopx(this.cycleRadius),
           check: false,
           style: {
             left: (cycleMargin + this.cycleRadius) * (j * 2 + 1) - this.cycleRadius + 'rpx',
@@ -39,24 +40,13 @@ class GestureLock {
     }
   }
 
-  // 使 画布 恢复初始状态
-  reset() {
-    this.circleArray.forEach((item) => {
-      item.check = false;
-    });
-    this.checkPoints = [];
-    this.lineArray = [];
-    this.activeLine = {};
-    this.lastCheckPoint = 0;
-  }
-
   onTouchStart(e) {
     this.setOffset(e);
-    this.checkTouch(e);
+    this.checkTouch({x: e.pageX - this.offsetX, y: e.pageY - this.offsetY});
   }
 
   onTouchMove(e) {
-    this.drawCanvas(e)
+    this.moveDraw(e)
   }
 
   onTouchEnd(e) {
@@ -70,78 +60,83 @@ class GestureLock {
   }
 
   // 检测当时 触摸位置是否位于 锁上
-  checkTouch(e) {
+  checkTouch({x, y}) {
     for (let i = 0; i < this.circleArray.length; i++) {
       let point = this.circleArray[i];
-      if (this.isPointInCycle(this.pxTorpx(e.pageX - this.offsetX), this.pxTorpx(e.pageY - this.offsetY), point.x, point.y, this.cycleRadius)) {
+      if (this.isPointInCycle(x, y, point.x, point.y, point.radius)) {
         if (!point.check) {
           this.checkPoints.push(point);
           if (this.lastCheckPoint != 0) {
-            // 在这里 画之前存在的 线
+            // 已激活锁之间的线段
             const line = this.drawLine(this.lastCheckPoint, point);
             this.lineArray.push(line);
           }
-
-
           this.lastCheckPoint = point;
         }
         point.check = true;
         return;
       }
     }
-
   }
 
+  // 画线 - 返回 样式 对象
   drawLine(start, end) {
-
-    const width = Math.sqrt((start.x - end.x) * (start.x - end.x) + (start.y - end.y) * (start.y - end.y));
+    const width = this.getPointDis(start.x, start.y, end.x, end.y);
     const rotate = this.getAngle(start, end);
-    const left = this.rpxTopx(start.x);
-    const top = this.rpxTopx(start.y);
 
     return {
-      activeLeft: left + 'px',
-      activeTop: top + 'px',
-      activeWidth: this.rpxTopx(width) + 'px',
+      activeLeft: start.x + 'px',
+      activeTop: start.y + 'px',
+      activeWidth: width + 'px',
       activeRotate: rotate + 'deg'
     }
 
   }
 
+  // 获取 画线的 角度
   getAngle(start, end) {
     var diff_x = end.x - start.x, diff_y = end.y - start.y;
-    if (diff_x == 0) {
-      return 360 * Math.atan(diff_y / diff_x) / (2 * Math.PI);
-    }
-    if (diff_x > 0) {
+    if (diff_x >= 0) {
       return 360 * Math.atan(diff_y / diff_x) / (2 * Math.PI);
     } else {
       return 180 + 360 * Math.atan(diff_y / diff_x) / (2 * Math.PI);
     }
   }
 
+  // 判断 当前点是否位于 锁内
   isPointInCycle(x, y, circleX, circleY, radius) {
     return (this.getPointDis(x, y, circleX, circleY) < radius) ? true : false;
   }
 
+  // 获取两点之间距离
   getPointDis(ax, ay, bx, by) {
     return Math.sqrt(Math.pow(ax - bx, 2) + Math.pow(ay - by, 2));
   }
 
-  drawCanvas(e) {
+  // 移动 绘制
+  moveDraw(e) {
     // 画经过的圆
-    this.checkTouch(e);
+    const x = e.pageX - this.offsetX;
+    const y = e.pageY - this.offsetY;
+    this.checkTouch({x, y});
 
-    // 画新的线
-    this.activeLine = this.drawLine(this.lastCheckPoint, {
-      x: this.pxTorpx(e.pageX - this.offsetX),
-      y: this.pxTorpx(e.pageY - this.offsetY)
-    });
-    console.log(this.activeLine);
-
+    // 画 最后一个激活的锁与当前位置之间的线段
+    this.activeLine = this.drawLine(this.lastCheckPoint, {x, y});
   }
 
-  // 获取 activeLine
+  // 使 画布 恢复初始状态
+  reset() {
+    this.circleArray.forEach((item) => {
+      item.check = false;
+    });
+    this.checkPoints = [];
+    this.lineArray = [];
+    this.activeLine = {};
+    this.lastCheckPoint = 0;
+  }
+
+
+  // 获取 最后一个激活的锁与当前位置之间的线段
   getActiveLine() {
     return this.activeLine;
   }
@@ -151,6 +146,7 @@ class GestureLock {
     return this.circleArray;
   }
 
+  // 获取 已激活锁之间的线段
   getLineArray() {
     return this.lineArray;
   }
@@ -159,12 +155,6 @@ class GestureLock {
   rpxTopx(rpx) {
     return rpx / 750 * this.windowWidth;
   }
-
-  // 将 PX 转换成 RPX
-  pxTorpx(px) {
-    return px * 750 / this.windowWidth;
-  }
-
 }
 
 export default GestureLock;
