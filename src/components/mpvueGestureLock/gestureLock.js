@@ -50,7 +50,9 @@ class GestureLock {
   }
 
   onTouchEnd(e) {
+    const checkPoints = this.checkPoints;
     this.reset();
+    return checkPoints;
   }
 
   // 初始化 偏移量
@@ -65,7 +67,7 @@ class GestureLock {
       let point = this.circleArray[i];
       if (this.isPointInCycle(x, y, point.x, point.y, point.radius)) {
         if (!point.check) {
-          this.checkPoints.push(point);
+          this.checkPoints.push(point.count);
           if (this.lastCheckPoint != 0) {
             // 已激活锁之间的线段
             const line = this.drawLine(this.lastCheckPoint, point);

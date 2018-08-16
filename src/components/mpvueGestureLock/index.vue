@@ -48,8 +48,9 @@
       },
 
       onTouchEnd(e) {
-        this.gestureLock.onTouchEnd(e);
+        const checkPoints = this.gestureLock.onTouchEnd(e);
         this.refesh();
+        this.$emit("end", checkPoints);
       },
       refesh() {
         this.circleArray = this.gestureLock.getCycleArray();
