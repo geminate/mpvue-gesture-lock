@@ -6,16 +6,14 @@
        @touchend="onTouchEnd"
   >
     <!-- 9 个圆 -->
-    <div v-for="(item,i) in circleArray"
-         :key="i"
-         class="cycle"
-         :class="{check:item.check}"
+    <div v-for="(item,i) in circleArray" :key="i" class="cycle" :class="{check:item.check}"
          :style="{left:item.style.left,top:item.style.top,width:item.style.width,height:item.style.width}">
     </div>
 
     <!-- 已激活锁之间的线段 -->
-    <div v-for="(item,idx) in lineArray" :key="idx" class="line"
-         :style="{left:item.activeLeft,top:item.activeTop,width:item.activeWidth,transform:'rotate('+item.activeRotate+')'}"></div>
+    <div v-for="(item,i) in lineArray" :key="i" class="line"
+         :style="{left:item.activeLeft,top:item.activeTop,width:item.activeWidth,transform:'rotate('+item.activeRotate+')'}">
+    </div>
 
     <!-- 最后一个激活的锁与当前位置之间的线段 -->
     <div class="line"
@@ -41,26 +39,27 @@
     methods: {
       onTouchStart(e) {
         this.gestureLock.onTouchStart(e);
-        this.circleArray = this.gestureLock.getCycleArray();
+        this.refesh();
       },
 
       onTouchMove(e) {
         this.gestureLock.onTouchMove(e);
-        this.circleArray = this.gestureLock.getCycleArray();
-        this.lineArray = this.gestureLock.getLineArray();
-        this.activeLine = this.gestureLock.getActiveLine();
+        this.refesh();
       },
 
       onTouchEnd(e) {
         this.gestureLock.onTouchEnd(e);
+        this.refesh();
+      },
+      refesh() {
         this.circleArray = this.gestureLock.getCycleArray();
         this.lineArray = this.gestureLock.getLineArray();
         this.activeLine = this.gestureLock.getActiveLine();
-      },
+      }
     },
     mounted() {
       this.gestureLock = new GestureLock(this.containerWidth, this.cycleRadius);
-      this.circleArray = this.gestureLock.getCycleArray();
+      this.refesh();
     }
   }
 </script>
@@ -76,17 +75,26 @@
   .cycle {
     box-sizing: border-box;
     position: absolute;
-    border: 1px solid black;
+    border: 2px solid #66aaff;
     border-radius: 50%;
 
-    &.check {
-      background: yellow;
+    &.check:after {
+      content: "";
+      display: block;
+      position: absolute;
+      width: 32%;
+      height: 32%;
+      border: 2px solid #66aaff;
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
     }
   }
 
   .line {
     height: 0;
-    border-top: 1px solid black;
+    border-top: 2px solid #66aaff;
     position: absolute;
     transform-origin: left center;
   }
