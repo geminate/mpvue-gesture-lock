@@ -15,6 +15,8 @@
 
 <style scoped>
   .index-page {
+    box-sizing: border-box;
+    padding-top: 1rem;
     height: 100vh;
     width: 100vw;
   }

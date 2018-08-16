@@ -27,7 +27,7 @@
 
   export default {
     name: 'index',
-    props: ['containerWidth', 'cycleRadius'],
+    props: ['containerWidth', 'cycleRadius'],// 容器宽度 和 圆的半径 单位是 rpx
     data() {
       return {
         gestureLock: {},

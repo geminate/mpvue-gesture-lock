@@ -6,26 +6,21 @@ class GestureLock {
 
     this.circleArray = [];  // 全部圆的对象数组
     this.checkPoints = []; // 选中的圆的对象数组
-    this.lineArray = [];
-    this.lastCheckPoint = 0;
+    this.lineArray = []; // 已激活锁之间的线段数组
+    this.lastCheckPoint = 0; // 最后一个激活的锁
     this.offsetX = 0; // 容器的 X 偏移
     this.offsetY = 0;// 容器的 Y 偏移
-    this.windowWidth = 750;
-    this.activeLine = {};
+    this.activeLine = {}; // 最后一个激活的锁与当前位置之间的线段
 
+    this.windowWidth = wx.getSystemInfoSync().windowWidth;// 窗口大小(用于rpx 和 px 转换)
 
-    this.initCircleArray(); // 初始化参数
+    this.initCircleArray();
   }
 
+  // 初始化 画布上的 9个圆
   initCircleArray() {
     const cycleMargin = (this.containerWidth - 6 * this.cycleRadius) / 6;
-    this.windowWidth = wx.getSystemInfoSync().windowWidth;
     let count = 0;
-    this.circleArray = [];
-    this.checkPoints = [];
-    this.lineArray = [];
-    this.activeLine = {};
-    this.lastCheckPoint = 0;
     for (let i = 0; i < 3; i++) {
       for (let j = 0; j < 3; j++) {
         count++;
@@ -44,9 +39,19 @@ class GestureLock {
     }
   }
 
+  // 使 画布 恢复初始状态
+  reset() {
+    this.circleArray.forEach((item) => {
+      item.check = false;
+    });
+    this.checkPoints = [];
+    this.lineArray = [];
+    this.activeLine = {};
+    this.lastCheckPoint = 0;
+  }
+
   onTouchStart(e) {
-    this.offsetX = e.currentTarget.offsetLeft;
-    this.offsetY = e.currentTarget.offsetTop;
+    this.setOffset(e);
     this.checkTouch(e);
   }
 
@@ -55,11 +60,17 @@ class GestureLock {
   }
 
   onTouchEnd(e) {
-    this.initCircleArray();
+    this.reset();
   }
 
-  checkTouch(e) {
+  // 初始化 偏移量
+  setOffset(e) {
+    this.offsetX = e.currentTarget.offsetLeft;
+    this.offsetY = e.currentTarget.offsetTop;
+  }
 
+  // 检测当时 触摸位置是否位于 锁上
+  checkTouch(e) {
     for (let i = 0; i < this.circleArray.length; i++) {
       let point = this.circleArray[i];
       if (this.isPointInCycle(this.pxTorpx(e.pageX - this.offsetX), this.pxTorpx(e.pageY - this.offsetY), point.x, point.y, this.cycleRadius)) {
@@ -67,7 +78,7 @@ class GestureLock {
           this.checkPoints.push(point);
           if (this.lastCheckPoint != 0) {
             // 在这里 画之前存在的 线
-            const line = this.drawLine(this.lastCheckPoint, point)
+            const line = this.drawLine(this.lastCheckPoint, point);
             this.lineArray.push(line);
           }
 
