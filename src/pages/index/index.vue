@@ -1,7 +1,8 @@
 <template>
   <div class="index-page">
-    <mpvue-gesture-lock :containerWidth="600" :cycleRadius="70" @end="onEnd"></mpvue-gesture-lock>
+    <mpvue-gesture-lock :containerWidth="600" :cycleRadius="70" @end="onEnd" :password="password"></mpvue-gesture-lock>
     <div class="result">{{data}}</div>
+    <div class="result">正确密码是：12369</div>
   </div>
 </template>
 
@@ -13,7 +14,8 @@
     components: {mpvueGestureLock},
     data() {
       return {
-        data: []
+        data: [],
+        password: [1, 2, 3, 6, 9]
       }
     },
     methods: {
