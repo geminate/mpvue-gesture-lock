@@ -5,7 +5,7 @@
 
 ## 截图
 
-<p align="center"><img src="http://liuhuihao.com/wp-content/uploads/2018/08/gestureLock.gif" alt="d-tools"></p>
+<p align="center"><img src="http://liuhuihao.com/wp-content/uploads/2018/08/gesture.gif" alt="d-tools"></p>
 
 ## 构建
 ``` bash
