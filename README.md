@@ -1,5 +1,5 @@
 ## 简介
-> 微信小程序的手势解锁组件。基于Mpvue开发。
+> 微信小程序的手势解锁组件。基于Mpvue开发。另有 [原生小程序版本的手势解锁](https://github.com/geminate/mini-gesture-lock)
 
 **组件使用 DOM 实现，非Canvas。原因是微信小程序的Canvas目前存在问题，网上其他使用Canvas实现手势解锁的组件在小程序中存在严重的卡顿问题**
 
@@ -23,3 +23,4 @@ npm run dev
 ## 组件属性
 - containerWidth 容器宽度 单位rpx
 - cycleRadius    锁圆宽度 单位rpx
+- password 正确密码
